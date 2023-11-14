@@ -2,19 +2,21 @@
 # Description: thread that observe variables by serial communication and 
 #              executes a callback function when a value changes
 # Created at: 2023-10-27
-# Last update: 2023-10-27
+# Last update: 2023-10-28
 
 from time import sleep
+from datetime import datetime
 from PyQt5.QtCore import QThread, pyqtSignal
 
-class Observer():
+class Observer(QThread):
 
     onValueChange = pyqtSignal(str, float)
 
-
     def __init__(self, get_function, delay: int = 0.1):
         super(Observer, self).__init__()
+
         self.get_function = get_function
+        self.save_path = None
         self.delay = delay
 
         self.variables = {}
@@ -40,6 +42,19 @@ class Observer():
         }
 
 
+    def setSavePath(self, path: str):
+
+        """
+        Sets the path where the data will be saved.
+        
+        Params
+        ------
+        path (str): path where the data will be saved.
+        """
+
+        self.save_path = path
+
+
     def stop(self):
 
         """
@@ -49,33 +64,39 @@ class Observer():
         self.is_running = False
 
 
+    def get(self, parameter: str):
+
+        """
+        Returns the value of the variable.
+
+        Params
+        ------
+        parameter (str): name of the variable.
+        """
+
+        return self.variables[parameter]["value"]
+
+
     def run(self):
 
-        for name, items in self.variables.items():
-            value = self.get_function(items["command"])
-            if value != items["value"]:
-                items["value"] = value
-                items["callback"](name, value)
-        #sleep(self.delay)
+        """
+        Starts the variable observer. This function save the readed
+        data in a file and executes a callback function when a value
+        changes.
+        """
 
+        while self.is_running:
 
-if __name__ == "__main__":
+            now = datetime.now().strftime("%H:%M:%S.%f")
 
+            for name, items in self.variables.items():
+                value = self.get_function(items["command"])
+                if value is not None:
+                    if self.save_path is not None:
+                        with open(self.save_path + f"/{name}.txt", "a") as file:
+                            file.write(f"{now},{value}\n")
+                    if value != items["value"]:
+                        items["value"] = value
+                        items["callback"](name, value)
 
-    def get(command: str):
-        print(command)
-        return 10
-    
-    def callback(name: str, value: float):
-        print("Callback:", name, value)
-
-
-    obsv = Observer(get)
-    obsv.appendVariable("v1", "#g00;", callback)
-    obsv.appendVariable("v2", "#g01;", callback)
-    obsv.appendVariable("v3", "#g02;", callback)
-    obsv.appendVariable("v4", "#g03;", callback)
-    obsv.appendVariable("v5", "#g04;", callback)
-    obsv.appendVariable("v6", "#g05;", callback)
-
-    obsv.run()
+            sleep(self.delay)

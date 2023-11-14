@@ -9,15 +9,15 @@
 
 #include "BCS_main.h"
 
-timerFlags_t timFlags;
-Axis Axes[MAX_AXES];
-SCHA63TOutput SCHA63TData;
+extern timerFlags_t timFlags;
+extern Axis Axes[MAX_AXES];
+extern SCHA63TOutput SCHA63TData;
 
-float fLastMotorSpeed;
-float fMotorAcceleration;
-float fActuadorTorque;
-float fAccelerationMeasured;
-float fAccelerationAngle;
+extern float fLastMotorSpeed;
+extern float fMotorAcceleration;
+extern float fActuadorTorque;
+extern float fAccelerationMeasured;
+extern float fAccelerationAngle;
 
 extern pid_data_type pidConfig;
 
@@ -87,9 +87,6 @@ void vBCSInit(void)
 //**********************************************************************//
 void vBCSMain(void)
 {
-
-	vCommunicationStartBroadcast(1000);
-
 	while (1)
 	{
 		if(timFlags.ui10ms == 1)
@@ -114,39 +111,6 @@ void vBCSMain(void)
 			timFlags.ui10ms = 0;
 		}
 	}
-}
-
-
-//**********************************************************************//
-// Method:      HAL_TIM_PeriodElapsedCallback                           //
-// Description: Callback function of period elapsed in STM32 timers     //
-// Parameters:  TIM_HandleTypeDef *: pointer to timer that trigger the  //
-//                                   interruption                       //
-// Returns:     n/a                                                     //
-//**********************************************************************//
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	// htim7 is triggered with an rate of 10ms
-	if(htim == &htim7)
-	{
-		if(timFlags.ui10ms)
-		{
-			HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-		}
-
-		timFlags.ui10ms = 1;
-		timFlags.uiCounter++;
-
-		if(timFlags.uiCounter % 10 == 0)
-			timFlags.ui100ms = 1;
-		if(timFlags.uiCounter % 100 == 0)
-		{
-			timFlags.ui1000ms = 1;
-			timFlags.uiCounter = 0;
-		}
-	}
-	else if(htim == &htim6)
-		vCommunicationSendBroadcast();
 }
 
 //**********************************************************************//

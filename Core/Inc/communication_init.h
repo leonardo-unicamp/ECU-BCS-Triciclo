@@ -110,14 +110,14 @@ void create(void){
 	smPidKp.fLowerLimit = -100;
 	smPidKp.fUpperLimit = +100;
 
-	smPidKi.fData      = &pidConfig.fKp;
+	smPidKi.fData      = &pidConfig.fKi;
 	smPidKi.eDataType  = FLOAT;
 	smPidKi.uiReadable = SM_TRUE;
 	smPidKi.uiWritable = SM_TRUE;
 	smPidKi.fLowerLimit = -100;
 	smPidKi.fUpperLimit = +100;
 
-	smPidKd.fData      = &pidConfig.fKp;
+	smPidKd.fData      = &pidConfig.fKd;
 	smPidKd.eDataType  = FLOAT;
 	smPidKd.uiReadable = SM_TRUE;
 	smPidKd.uiWritable = SM_TRUE;

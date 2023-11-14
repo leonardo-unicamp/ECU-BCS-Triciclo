@@ -18,8 +18,9 @@ actuatorSettings_t xActSettings;
 extern float fActuadorTorque;
 extern float fAccelerationMeasured;
 
-unsigned int uiTime;
+unsigned int uiCounter;
 unsigned int uiMaxBufferCounter;
+float fActuatorPosition;
 float fSinBuffer[MAX_SIGNAL_BUFFER_SIZE];
 float fChirpBuffer[MAX_SIGNAL_BUFFER_SIZE];
 
@@ -121,7 +122,7 @@ void vActuatorPositionControlStart(actMotionTypes_t eMotionType)
 		Set_Controller_Modes(xActSettings.xMotor, POSITION_CONTROL, PASSTHROUGH);
 		xActSettings.uiControlType = ACT_POSITION_CONTROL;
 		xActSettings.uiMotionType = eMotionType;
-		uiTime = 0;
+		uiCounter = 0;
 	}
 }
 
@@ -179,6 +180,11 @@ void vActuadorRun(void)
 			break;
 
 		case ACT_POSITION_CONTROL:
+			if(uiCounter < uiMaxBufferCounter)
+				fActuatorPosition = fSinBuffer[uiCounter++];
+			else
+				uiCounter = 0;
+			//Set_Input_Pos(xActSettings.xMotor, fActuatorPosition, 96, 3.86);
 			break;
 	}
 }

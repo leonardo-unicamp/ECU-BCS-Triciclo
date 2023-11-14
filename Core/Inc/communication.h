@@ -25,7 +25,8 @@
 #define SM_SET     3
 #define SM_PARAM   4
 #define SM_VALUE   5
-#define SM_CANCEL  6
+#define SM_STREAM  6
+#define SM_CANCEL  7
 
 // Communication type
 #define SM_UART       0
