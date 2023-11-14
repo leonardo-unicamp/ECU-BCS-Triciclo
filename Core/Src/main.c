@@ -34,8 +34,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "BCS_main.h"
-extern timerFlags_t timFlags;
+#include "systemInit.h"
+timerFlags_t timFlags;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

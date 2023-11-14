@@ -1,5 +1,5 @@
 //**********************************************************************//
-// File:        systemInit.c                                            //
+// File:        systemControl.c                                         //
 // Description: Source file that contains the functions and methods     //
 //              implementations for system control task                 //
 // Author:      Leonardo Rossi Leao                                     //
@@ -8,7 +8,6 @@
 //**********************************************************************//
 
 #include "systemControl.h"
-
 
 systemControlSettings_t xSystemControl;
 
@@ -32,7 +31,7 @@ void vSystemControlInit(void)
 // Input:       none                                                    //
 // Output:      none                                                    //
 //**********************************************************************//
-void vSystemControlStart(void)
+void vSystemControlStart()
 {
 
 }
