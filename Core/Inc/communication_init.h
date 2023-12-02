@@ -11,6 +11,9 @@
 #define INC_COMMUNICATION_INIT_H_
 
 #include "communication.h"
+#include "stddef.h"
+#include "Controller.h"
+#include "rtwtypes.h"
 
 extern Axis Axes[MAX_AXES];
 extern SCHA63TOutput SCHA63TData;
@@ -21,6 +24,16 @@ extern float fMotorAcceleration;
 extern float fActuadorTorque;
 extern float fAccelerationMeasured;
 extern float fAccelerationAngle;
+extern ExtU_Controller_T U;            /* External inputs */
+extern ExtY_Controller_T Y;
+
+extern float At;
+extern float Ai;
+extern float Us;
+extern float acccc;
+extern float udis;
+extern float thetasl;
+extern float dthetasl;
 
 stateMachineData_t smGyroscopeX;
 stateMachineData_t smGyroscopeY;
@@ -41,6 +54,13 @@ stateMachineData_t smMotorAcceleration;
 stateMachineData_t smAccelerationMeasured;
 stateMachineData_t smAccelerationAngle;
 stateMachineData_t smActuadorTorque;
+stateMachineData_t smAi;
+stateMachineData_t smAt;
+stateMachineData_t smSlindingModeU;
+stateMachineData_t smSlindingModeAcc;
+stateMachineData_t smSlindingModeUdis;
+stateMachineData_t smSlindingModeTheta;
+stateMachineData_t smSlindingModeDTheta;
 
 void create(void){
 	smGyroscopeX.fData      = &SCHA63TData.data_gyro[0];
@@ -143,6 +163,41 @@ void create(void){
 	smActuadorTorque.eDataType  = FLOAT;
 	smActuadorTorque.uiReadable = SM_TRUE;
 	smActuadorTorque.uiWritable = SM_FALSE;
+
+	smAi.fData      = &Ai;
+	smAi.eDataType  = FLOAT;
+	smAi.uiReadable = SM_TRUE;
+	smAi.uiWritable = SM_FALSE;
+
+	smAt.fData      = &At;
+	smAt.eDataType  = FLOAT;
+	smAt.uiReadable = SM_TRUE;
+	smAt.uiWritable = SM_FALSE;
+
+	smSlindingModeU.fData      = &Us;
+	smSlindingModeU.eDataType  = FLOAT;
+	smSlindingModeU.uiReadable = SM_TRUE;
+	smSlindingModeU.uiWritable = SM_FALSE;
+
+	smSlindingModeAcc.fData      = &acccc;
+	smSlindingModeAcc.eDataType  = FLOAT;
+	smSlindingModeAcc.uiReadable = SM_TRUE;
+	smSlindingModeAcc.uiWritable = SM_FALSE;
+
+	smSlindingModeUdis.fData      = &udis;
+	smSlindingModeUdis.eDataType  = FLOAT;
+	smSlindingModeUdis.uiReadable = SM_TRUE;
+	smSlindingModeUdis.uiWritable = SM_FALSE;
+
+	smSlindingModeTheta.fData      = &thetasl;
+	smSlindingModeTheta.eDataType  = FLOAT;
+	smSlindingModeTheta.uiReadable = SM_TRUE;
+	smSlindingModeTheta.uiWritable = SM_FALSE;
+
+	smSlindingModeDTheta.fData      = &dthetasl;
+	smSlindingModeDTheta.eDataType  = FLOAT;
+	smSlindingModeDTheta.uiReadable = SM_TRUE;
+	smSlindingModeDTheta.uiWritable = SM_FALSE;
 }
 
 #endif /* INC_COMMUNICATION_INIT_H_ */

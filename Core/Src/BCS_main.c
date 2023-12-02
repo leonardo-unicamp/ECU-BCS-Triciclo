@@ -7,6 +7,10 @@
 // Last update: 2023-10-17                                              //
 //**********************************************************************//
 
+// Sliding Mode Libraries
+#include "stddef.h"
+#include "Controller.h"
+#include "rtwtypes.h"
 #include "BCS_main.h"
 
 timerFlags_t timFlags;
@@ -20,6 +24,15 @@ float fAccelerationMeasured;
 float fAccelerationAngle;
 
 extern pid_data_type pidConfig;
+
+RT_MODEL_Controller_T M_;
+RT_MODEL_Controller_T *const MPtr = &M_;/* Real-time model */
+ExtU_Controller_T U;            /* External inputs */
+ExtY_Controller_T Y;
+
+float At;
+float Ai;
+float Us;
 
 
 //**********************************************************************//
@@ -70,9 +83,6 @@ void vBCSInit(void)
 	HAL_TIM_Base_Start_IT(&htim7);  // System and IMU updates
 	HAL_TIM_Base_Start_IT(&htim6);  // Communication state machine
 
-	// Initialize PID BCS control
-	pid_init(64, 37, 2.0, 400, 200);
-
 	// Turn on led that indicate that system has already initialized
 	HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
 }
@@ -87,8 +97,9 @@ void vBCSInit(void)
 //**********************************************************************//
 void vBCSMain(void)
 {
-
-	vCommunicationStartBroadcast(1000);
+	// Sliding Mode
+	RT_MODEL_Controller_T *const M = MPtr;
+	vCommunicationStartBroadcast(10);
 
 	while (1)
 	{
@@ -109,11 +120,26 @@ void vBCSMain(void)
 			fLastMotorSpeed = degToRad(motorTurnsToAngle(Axes[0].AXIS_Encoder_Vel));
 			//fAccelerationMeasured -= filter(IMU_HEIGHT*fMotorAcceleration);
 
-			vActuadorRun();
+			U.aI = SCHA63TData.data_gyro[0];
+			U.at = SCHA63TData.data_gyro[3];
+			Controller_step(M, &U, &Y);
+
+			if (Y.u_sliding_mode <= 1 && Y.u_sliding_mode >= -1)
+				Set_Input_Torque(Axes[0], Y.u_sliding_mode);
+			else if(Y.u_sliding_mode <= 1)
+				Set_Input_Torque(Axes[0], -1);
+			else if(Y.u_sliding_mode >= 1)
+				Set_Input_Torque(Axes[0], 1);
+
+			At = (float) U.at;
+			Ai = (float) U.aI;
+			Us = (float) Y.u_sliding_mode;
 
 			timFlags.ui10ms = 0;
 		}
 	}
+
+	Controller_terminate(M);
 }
 
 

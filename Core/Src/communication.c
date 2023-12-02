@@ -44,28 +44,34 @@ void vCommunicationInit(UART_HandleTypeDef *pUart, UART_HandleTypeDef *pBluetoot
 	xComSettings.xBroadcast.htim = &htim6;
 	xComSettings.xBroadcast.pTimer = TIM6;
 
-	// Setting up broadcast variables
-	xComSettings.xBroadcast.pBuffer[0]  = &SCHA63TData.data_gyro[0];          // Gyroscope X
-	xComSettings.xBroadcast.pBuffer[1]  = &SCHA63TData.data_gyro[1];          // Gyroscope Y
-	xComSettings.xBroadcast.pBuffer[2]  = &SCHA63TData.data_gyro[2];          // Gyroscope Z
-	xComSettings.xBroadcast.pBuffer[3]  = &SCHA63TData.data_accl[0];          // Acceleration X
-	xComSettings.xBroadcast.pBuffer[4]  = &SCHA63TData.data_accl[1];          // Acceleration Y
-	xComSettings.xBroadcast.pBuffer[5]  = &SCHA63TData.data_accl[2];          // Acceleration Z
-	xComSettings.xBroadcast.pBuffer[6]  = &SCHA63TData.temperature;           // Temperature
-	xComSettings.xBroadcast.pBuffer[8]  = &Axes[0].AXIS_Encoder_Pos;          // Encoder Position
-	xComSettings.xBroadcast.pBuffer[9]  = &Axes[0].AXIS_Encoder_Vel;          //
-	xComSettings.xBroadcast.pBuffer[10] = &Axes[0].AXIS_Iq_Measured;          //
-	xComSettings.xBroadcast.pBuffer[11] = &Axes[0].AXIS_Iq_Setpoint;          //
-	xComSettings.xBroadcast.pBuffer[12] = &Axes[0].AXIS_Motor_Temperature;    //
-	xComSettings.xBroadcast.pBuffer[13] = &Axes[0].AXIS_FET_Temperature;      //
-	xComSettings.xBroadcast.pBuffer[14] = &pidConfig.fKp;                     // Controller proportional constant
-	xComSettings.xBroadcast.pBuffer[15] = &pidConfig.fKi;                     // Controller integrative constant
-	xComSettings.xBroadcast.pBuffer[16] = &pidConfig.fKd;                     // Controller derivative constant
-	xComSettings.xBroadcast.pBuffer[17] = &fMotorAcceleration;
-	xComSettings.xBroadcast.pBuffer[18] = &fAccelerationMeasured;
-	xComSettings.xBroadcast.pBuffer[19] = &fAccelerationAngle;
-	xComSettings.xBroadcast.pBuffer[20] = &fActuadorTorque;
-	xComSettings.xBroadcast.uiCounter = 21;
+	// Creating Buffer
+	create();
+	//vCommunicationStateMachineAppendData(smGyroscopeX);
+	//vCommunicationStateMachineAppendData(smGyroscopeY);
+	//vCommunicationStateMachineAppendData(smGyroscopeZ);
+	//vCommunicationStateMachineAppendData(smAccelerationX);
+	//vCommunicationStateMachineAppendData(smAccelerationY);
+	//vCommunicationStateMachineAppendData(smAccelerationZ);
+	//vCommunicationStateMachineAppendData(smEncoderPosition);
+	//vCommunicationStateMachineAppendData(smEncoderVelocity);
+	//vCommunicationStateMachineAppendData(smIqMeasured);
+	//vCommunicationStateMachineAppendData(smIqSetpoint);
+	//vCommunicationStateMachineAppendData(smMotorTemperature);
+	//vCommunicationStateMachineAppendData(smFetTemperature);
+	//vCommunicationStateMachineAppendData(smPidKp);
+	//vCommunicationStateMachineAppendData(smPidKi);
+	//vCommunicationStateMachineAppendData(smPidKd);
+	//vCommunicationStateMachineAppendData(smMotorAcceleration);
+	//vCommunicationStateMachineAppendData(smAccelerationMeasured);
+	//vCommunicationStateMachineAppendData(smAccelerationAngle);
+	//vCommunicationStateMachineAppendData(smActuadorTorque);
+	vCommunicationStateMachineAppendData(smAi);
+	vCommunicationStateMachineAppendData(smAt);
+	vCommunicationStateMachineAppendData(smSlindingModeU);
+	vCommunicationStateMachineAppendData(smSlindingModeAcc);
+	vCommunicationStateMachineAppendData(smSlindingModeUdis);
+	vCommunicationStateMachineAppendData(smSlindingModeTheta);
+	vCommunicationStateMachineAppendData(smSlindingModeDTheta);
 
 	// Initial state of machine
 	xComSettings.uiCurrentState = SM_INIT;
@@ -167,9 +173,6 @@ void vCommunicationStateMachine(char cChar)
 			vCommunicationStateMachineParam(cChar);
 			break;
 
-		case SM_BROADCAST:
-			vCommunicationStateMachineBroadcast(cChar);
-
 		case SM_CANCEL:
 			sprintf(cBuffer, "#e;");
 			vCommunicationWrite(cBuffer);
@@ -201,7 +204,7 @@ void vCommunicationStateMachineReady(char cChar)
 	}
 	else if(cChar == 'b')
 	{
-		xComSettings.uiCallState = SM_BROADCAST;
+		xComSettings.uiCallState = SM_STREAM;
 		xComSettings.uiCurrentState = SM_PARAM;
 	}
 	else
@@ -251,17 +254,17 @@ void vCommunicationStateMachineGet(char cChar)
 		{
 			case INT:
 				iValueGet = *xComSettings.smBuffer[uiOptionId].iData;
-				sprintf(cBuffer, "#a%dv%d;", uiOptionId, iValueGet);
+				sprintf(cBuffer, "#a%.2dv%d;\n", uiOptionId, iValueGet);
 				break;
 
 			case FLOAT:
 				fValueGet = *xComSettings.smBuffer[uiOptionId].fData;
-				sprintf(cBuffer, "#a%dv%.5f;", uiOptionId, fValueGet);
+				sprintf(cBuffer, "#a%.2dv%.5f;\n", uiOptionId, fValueGet);
 				break;
 
 			case CHAR:
 				cValueGet = xComSettings.smBuffer[uiOptionId].cData;
-				sprintf(cBuffer, "#a%dv%s;", uiOptionId, cValueGet);
+				sprintf(cBuffer, "#a%.2dv%s;\n", uiOptionId, cValueGet);
 		}
 		vCommunicationWrite(cBuffer);
 		xComSettings.uiCurrentState = SM_INIT;
@@ -380,14 +383,14 @@ void vCommunicationStopBroadcast(void)
 void vCommunicationSendBroadcast(void)
 {
 	char cTemp[16];
-	char cBuffer[256] = "#b";
+	char cBuffer[500] = "#b";
 
 	uint8_t uiCounter;
-	uint8_t uiMaxCounter = xComSettings.xBroadcast.uiCounter;
+	uint8_t uiMaxCounter = xComSettings.uiBufferCounter;
 
 	for(uiCounter = 0; uiCounter < uiMaxCounter; uiCounter++)
 	{
-		sprintf(cTemp, "%.2f;", *xComSettings.xBroadcast.pBuffer[uiCounter]);
+		sprintf(cTemp, "%.5f;", *xComSettings.smBuffer[uiCounter].fData);
 		strcat(cBuffer, cTemp);
 	}
 
@@ -406,4 +409,3 @@ void vCommunicationLPUART1Callback(void)
 	vCommunicationRead(&cRxChar, 1);
 	vCommunicationStateMachine(cRxChar);
 }
-

@@ -28,7 +28,6 @@
 #include "ODrive.h"
 #include "math.h"
 #include "pid.h"
-#include "IIRfilter.h"
 #include "communication.h"
 #include "actuator.h"
 
