@@ -22,12 +22,12 @@ class ConnectionWindow(QMainWindow):
     signal_connect    = pyqtSignal(str, str)
     signal_disconnect = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, gui):
         super(ConnectionWindow, self).__init__()
         loadUi(os.path.join(RELATIVE_PATH, "../ui/connection.ui"), self)
         self.setWindowTitle("Device Connection")
 
-        self.comm = Communication()
+        self.gui = gui
         self.forms = {
             "commType": None,
             "port":     None,
@@ -55,9 +55,9 @@ class ConnectionWindow(QMainWindow):
         self.forms["commType"] = button
         
         if button == "serial":
-            self.available_devices = self.comm.serialGetAvailableDevices()
+            self.available_devices = self.gui.comm.serialGetAvailableDevices()
         elif button == "bluetooth":
-            self.available_devices = self.comm.bluetoothGetAvailableDevices()
+            self.available_devices = self.gui.comm.bluetoothGetAvailableDevices()
 
         self.cb_devices.clear()
         self.cb_devices.addItems([device[0] for device in self.available_devices])
@@ -107,8 +107,8 @@ class ConnectionWindow(QMainWindow):
         baudrate = self.cb_baudrate.currentText()
 
         if self.forms["commType"] == "serial":
-            self.comm.serialDisconnect()
-            conn_status = self.comm.serialConnect(port, baudrate)
+            self.gui.comm.serialDisconnect()
+            conn_status = self.gui.comm.serialConnect(port, baudrate)
         elif self.forms["commType"] == "bluetooth":
             #TODO: implement bluetooth connection
             pass
@@ -131,7 +131,7 @@ class ConnectionWindow(QMainWindow):
         """
 
         if self.forms["commType"] == "serial":
-            self.comm.serialDisconnect()
+            self.gui.comm.serialDisconnect()
             self.changeLedStatus("#C21807", "No device connected.")
             self.btn_connect.setText("Connect")
             self.btn_connect.clicked.disconnect()

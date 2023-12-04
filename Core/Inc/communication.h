@@ -17,6 +17,7 @@
 #include "string.h"
 #include "sensorReadings.h"
 #include "motorControl.h"
+#include "actuator.h"
 
 // States
 #define SM_INIT    0

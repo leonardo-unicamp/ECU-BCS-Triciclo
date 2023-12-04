@@ -9,7 +9,7 @@ import numpy as np
 
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSignal, Qt, QTimer
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QStyle, QFileDialog, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QStyle, QFileDialog, QVBoxLayout, QLabel, QLineEdit
 
 from widgets.matplotlibwidget import MatplotlibWidget
 
@@ -18,7 +18,7 @@ from modules.communication import Communication
 
 from windows.connection import ConnectionWindow
 from windows.parameters import ParametersWindow
-
+from windows.sin_config import SinWindow
 
 class App(QMainWindow):
 
@@ -40,26 +40,31 @@ class App(QMainWindow):
         self.plot_area_widget = QWidget()       
         self.plot_layout = QVBoxLayout()
 
-        self.conn_window  = ConnectionWindow()
+        self.conn_window  = ConnectionWindow(self)
         self.param_window = ParametersWindow()
+        self.sin_window = SinWindow()
         
         self.comm = Communication()
 
         self.conn_window.signal_connect.connect(self.deviceConnected)
         self.conn_window.signal_disconnect.connect(self.deviceDisconnected)
-
         self.param_window.signal_add.connect(self.addPlot)
-
+        self.sin_window.signal_set.connect(self.setParameter)
         self.signal_update_values.connect(self.updateDisplayValues)
+
         self.btn_connect_change.clicked.connect(self.conn_window.show)
         self.btn_add_plot.clicked.connect(self.param_window.show)
         self.btn_play.clicked.connect(self.play)
         self.btn_stop.clicked.connect(self.stop)
+        self.btn_config_sin.clicked.connect(self.sin_window.show)
 
         self.btn_play.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.btn_stop.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
 
         self.scrollArea.setWidgetResizable(True)
+
+        for id in range(13, 16):
+            self.findChild(QLineEdit, "le_" + str(id)).returnPressed.connect(lambda id=id: self.setValue(id))
         
 
     def deviceConnected(self, comm_type: str, device: str):
@@ -106,7 +111,7 @@ class App(QMainWindow):
             self.btn_stop.setEnabled(True)
 
             self.observer = Observer(self.comm.get, delay=0.1)
-            for i in range(22):
+            for i in range(26):
                 self.observer.appendVariable("%.2d" % i, "#g%.2d;" % i, self.signal_update_values.emit)
             self.observer.setSavePath(folder)
             self.observer.start()
@@ -172,6 +177,14 @@ class App(QMainWindow):
         self.plot_layout.setContentsMargins(0, 0, 0, 0)
         self.plot_area_widget.setLayout(self.plot_layout)
         self.scrollArea.setWidget(self.plot_area_widget)
+
+    def setValue(self, id):
+        value = float(self.findChild(QLineEdit, "le_" + str(id)).text())
+        self.setParameter(id, value)
+
+    def setParameter(self, id: int, value: float):
+        print("#s%.2d%.5f;" % (id, value))
+        self.comm.serialWrite("#s%.2d%.5f;" % (id, value))
 
 
 if __name__ == "__main__":

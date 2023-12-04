@@ -101,6 +101,8 @@ class Communication:
 
         if self.serial["isConnected"]:
             self.serial["connection"].write(message.encode("utf-8"))
+        else:
+            print("Serial is not connected.")
 
 
     def serialRead(self):
@@ -116,6 +118,7 @@ class Communication:
                 value = message[5:-2]
                 return param, value
         else:
+            print("Serial is not connected.")
             return None
 
 
@@ -135,7 +138,7 @@ class Communication:
         elif self.bluetooth["isConnected"]:
             return None
         else:
-            return np.random.randint(0, 100)
+            return 0
 
 
 
