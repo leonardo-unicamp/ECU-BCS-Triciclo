@@ -8,7 +8,7 @@
 //**********************************************************************//
 
 #include "communication.h"
-#include "communication_init.h"
+#include "communication_msg.h"
 
 uint8_t uiId[2];
 uint8_t uiIdCounter;
@@ -41,36 +41,18 @@ void vCommunicationInit(UART_HandleTypeDef *pUart, UART_HandleTypeDef *pBluetoot
 	xComSettings.xBroadcast.uiInterval = 100;
 
 	// Broadcast settings
-	xComSettings.xBroadcast.htim = &htim6;
+	//xComSettings.xBroadcast.htim = &htim6;
 	xComSettings.xBroadcast.pTimer = TIM6;
 
 	// Creating Buffer
 	create();
-	vCommunicationStateMachineAppendData(smGyroscopeX);
-	vCommunicationStateMachineAppendData(smGyroscopeY);
-	vCommunicationStateMachineAppendData(smGyroscopeZ);
-	vCommunicationStateMachineAppendData(smAccelerationX);
-	vCommunicationStateMachineAppendData(smAccelerationY);
-	vCommunicationStateMachineAppendData(smAccelerationZ);
-	vCommunicationStateMachineAppendData(smEncoderPosition);
-	vCommunicationStateMachineAppendData(smEncoderVelocity);
-	vCommunicationStateMachineAppendData(smIqMeasured);
-	vCommunicationStateMachineAppendData(smIqSetpoint);
-	vCommunicationStateMachineAppendData(smMotorTemperature);
-	vCommunicationStateMachineAppendData(smFetTemperature);
-	vCommunicationStateMachineAppendData(smPidKp);
-	vCommunicationStateMachineAppendData(smPidKi);
-	vCommunicationStateMachineAppendData(smPidKd);
-	vCommunicationStateMachineAppendData(smMotorAcceleration);
-	vCommunicationStateMachineAppendData(smAccelerationMeasured);
-	vCommunicationStateMachineAppendData(smAccelerationAngle);
-	vCommunicationStateMachineAppendData(smActuadorTorque);
 
 	// Initial state of machine
 	xComSettings.uiCurrentState = SM_INIT;
 
 	// Request to read the first character
 	HAL_UART_Receive_IT(xComSettings.pUart, (uint8_t *)&cRxChar, 1);
+	HAL_UART_Receive_IT(xComSettings.pBluetooth, (uint8_t *)&cRxChar, 1);
 }
 
 //**********************************************************************//
@@ -150,6 +132,11 @@ void vCommunicationStateMachine(char cChar)
 	switch(xComSettings.uiCurrentState)
 	{
 		case SM_INIT:
+
+			uiValueCounter = 0;
+			for(int i = 0; i < 32; i++)
+				cValueBuffer[i] = '\000';
+
 			if(cChar == '#')
 				xComSettings.uiCurrentState = SM_READY;
 			break;
@@ -160,6 +147,10 @@ void vCommunicationStateMachine(char cChar)
 
 		case SM_GET:
 			vCommunicationStateMachineGet(cChar);
+			break;
+
+		case SM_SET:
+			vCommunicationStateMachineSet(cChar);
 			break;
 
 		case SM_PARAM:
@@ -247,17 +238,17 @@ void vCommunicationStateMachineGet(char cChar)
 		{
 			case INT:
 				iValueGet = *xComSettings.smBuffer[uiOptionId].iData;
-				sprintf(cBuffer, "#a%.2dv%d;\n", uiOptionId, iValueGet);
+				sprintf(cBuffer, "#a%.2dv%d;\n\r", uiOptionId, iValueGet);
 				break;
 
 			case FLOAT:
 				fValueGet = *xComSettings.smBuffer[uiOptionId].fData;
-				sprintf(cBuffer, "#a%.2dv%.5f;\n", uiOptionId, fValueGet);
+				sprintf(cBuffer, "#a%.2dv%.5f;\n\r", uiOptionId, fValueGet);
 				break;
 
 			case CHAR:
 				cValueGet = xComSettings.smBuffer[uiOptionId].cData;
-				sprintf(cBuffer, "#a%.2dv%s;\n", uiOptionId, cValueGet);
+				sprintf(cBuffer, "#a%.2dv%s;\n\r", uiOptionId, cValueGet);
 		}
 		vCommunicationWrite(cBuffer);
 		xComSettings.uiCurrentState = SM_INIT;
@@ -285,6 +276,8 @@ void vCommunicationStateMachineSet(char cChar)
 	float fLowerLimit = xComSettings.smBuffer[uiOptionId].fLowerLimit;
 	float fUpperLimit = xComSettings.smBuffer[uiOptionId].fUpperLimit;
 
+	char cBuffer[64];
+
 	if(cChar == ';')
 	{
 		cValueBuffer[uiValueCounter] = '\0';
@@ -299,6 +292,8 @@ void vCommunicationStateMachineSet(char cChar)
 					{
 						*xComSettings.smBuffer[uiOptionId].iData = iReceivedNumber;
 						xComSettings.uiCurrentState = SM_INIT;
+						sprintf(cBuffer, "#ok;\n\r");
+						vCommunicationWrite(cBuffer);
 					}
 					else
 					{
@@ -313,6 +308,8 @@ void vCommunicationStateMachineSet(char cChar)
 					{
 						*xComSettings.smBuffer[uiOptionId].fData = fReceivedNumber;
 						xComSettings.uiCurrentState = SM_INIT;
+						sprintf(cBuffer, "#ok;\n\r");
+						vCommunicationWrite(cBuffer);
 					}
 					else
 					{
@@ -323,8 +320,13 @@ void vCommunicationStateMachineSet(char cChar)
 
 				case CHAR:
 					strcpy(xComSettings.smBuffer[uiOptionId].cData, cValueBuffer);
+					sprintf(cBuffer, "#ok;\n\r");
+					vCommunicationWrite(cBuffer);
 					break;
 			}
+		} else {
+			xComSettings.uiCurrentState = SM_CANCEL;
+			vCommunicationStateMachine(';');
 		}
 
 	}
@@ -402,4 +404,3 @@ void vCommunicationLPUART1Callback(void)
 	vCommunicationRead(&cRxChar, 1);
 	vCommunicationStateMachine(cRxChar);
 }
-

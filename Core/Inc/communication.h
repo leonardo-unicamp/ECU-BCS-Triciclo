@@ -10,13 +10,13 @@
 #ifndef INC_COMMUNICATION_H_
 #define INC_COMMUNICATION_H_
 
+#include "pid.h"
 #include "tim.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#include "SCHA63T.h"
-#include "oDrive.h"
-#include "pid.h"
+#include "sensorReadings.h"
+#include "motorControl.h"
 
 // States
 #define SM_INIT    0

@@ -35,7 +35,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "systemInit.h"
-timerFlags_t timFlags;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +55,7 @@ timerFlags_t timFlags;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t uiRx;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -127,7 +126,8 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_IT(&huart3, &uiRx, 1);
+  HAL_UART_Receive_IT(&huart6, &uiRx, 1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -278,21 +278,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // htim7 is triggered with an rate of 10ms
   	if(htim == &htim7)
   	{
-  		if(timFlags.ui10ms)
-  		{
-  			HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-  		}
 
-  		timFlags.ui10ms = 1;
-  		timFlags.uiCounter++;
-
-  		if(timFlags.uiCounter % 10 == 0)
-  			timFlags.ui100ms = 1;
-  		if(timFlags.uiCounter % 100 == 0)
-  		{
-  			timFlags.ui1000ms = 1;
-  			timFlags.uiCounter = 0;
-  		}
   	}
   	else if(htim == &htim6)
   		vCommunicationSendBroadcast();

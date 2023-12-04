@@ -10,15 +10,51 @@
 #ifndef INC_SENSORREADINGS_H_
 #define INC_SENSORREADINGS_H_
 
+#include "tim.h"
+#include "gps.h"
+#include "spi.h"
 #include "cmsis_os.h"
+#include "ODrive.h"
+#include "SCHA63T.h"
+#include "actuator.h"
 
+struct xCoordinates {
+	float fX;
+	float fY;
+	float fZ;
+};
+
+struct xIMU {
+	struct xCoordinates xGyroscope;
+	struct xCoordinates xAccelerometer;
+	float fTemperature;
+};
+
+struct xMotor {
+	float fEncoderPosition;
+	float fEncoderVelocity;
+	float fBusVoltage;
+	float fBusCurrent;
+	float fIqSetpoint;
+	float fIqMeasured;
+	float fTemperature;
+};
+
+struct xGPS {
+	float fLatitude;
+	char  cLatitudeRef;
+	float fLongitude;
+	char  cLongitudeRef;
+	float fSpeed;
+};
 
 typedef struct SensorsReadings {
-	float fMotorAcceleration;
-	float fActuatorTorque;
-	float fIMUAcceleration;
-	float fIMUAccelerationAngle;
+	struct xIMU   xIMU;
+	struct xGPS   xGPS;
+	struct xMotor xSuspensionMotor;
+	struct xMotor xHandlebarsMotor;
 } sensorReadings_t;
+
 
 //**********************************************************************//
 // Method:      vSensorReadingsInit                                     //

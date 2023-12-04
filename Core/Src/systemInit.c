@@ -12,6 +12,8 @@
 extern Axis xAxes;
 extern osThreadId_t systemControlHandle;
 
+uint8_t cTeste;
+
 //**********************************************************************//
 // Method:      vSystemInitStart                                        //
 // Description: Entrypoint to line follower robot initializing task     //
@@ -23,17 +25,16 @@ void vSystemInitStart()
 	vSensorReadingsInit();
 	vCommunicationInit(&huart3, &huart7);
 
-	HAL_TIM_Base_Start_IT(&htim7);  		// System and IMU updates
+	HAL_UART_Receive_IT(&huart6, &cTeste, 1);
+	HAL_TIM_Base_Start_IT(&htim7);
 
 	osThreadFlagsSet(systemControlHandle, 0b1);
 
 	vActuatorConfigSin(0.1, 8*3.14/181, 0, 0);
-	vActuatorPositionControlStart(SIN);
 
 	while(1)
 	{
-		vActuadorRun();
-		osDelay(10);
+		osDelay(1000);
 	}
 }
 
@@ -48,6 +49,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// UART communication wired and bluetooth
 	if(huart == &huart3 || huart == &huart7)
 		vCommunicationLPUART1Callback();
+	if(huart == &huart6)
+		vGPSUartCallback();
 }
 
 

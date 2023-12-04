@@ -31,6 +31,7 @@
 
 // System Libraries
 #include "pid.h"
+#include "gps.h"
 #include "ODrive.h"
 #include "SCHA63T.h"
 #include "actuator.h"
