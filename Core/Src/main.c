@@ -125,6 +125,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_TIM6_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &uiRx, 1);
   HAL_UART_Receive_IT(&huart6, &uiRx, 1);

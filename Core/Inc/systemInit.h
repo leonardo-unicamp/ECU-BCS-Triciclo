@@ -30,6 +30,7 @@
 #include "usb_otg.h"
 
 // System Libraries
+#include "lcd.h"
 #include "pid.h"
 #include "gps.h"
 #include "ODrive.h"

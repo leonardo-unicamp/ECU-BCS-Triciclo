@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>276</width>
-    <height>602</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>276</width>
-    <height>602</height>
+    <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>276</width>
-    <height>602</height>
+    <height>480</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -41,7 +41,7 @@
     <property name="title">
      <string>IMU</string>
     </property>
-    <widget class="QCheckBox" name="cb_00">
+    <widget class="QCheckBox" name="cb_03">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -54,7 +54,7 @@
       <string>Gyroscope-X</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_01">
+    <widget class="QCheckBox" name="cb_04">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -67,7 +67,7 @@
       <string>Gyroscope-Y</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_02">
+    <widget class="QCheckBox" name="cb_05">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -80,7 +80,7 @@
       <string>Gyroscope-Z</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_03">
+    <widget class="QCheckBox" name="cb_00">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -93,7 +93,7 @@
       <string>Accelerometer-X</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_04">
+    <widget class="QCheckBox" name="cb_01">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -106,7 +106,7 @@
       <string>Accelerometer-Y</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_05">
+    <widget class="QCheckBox" name="cb_02">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -126,7 +126,7 @@
       <x>10</x>
       <y>200</y>
       <width>251</width>
-      <height>231</height>
+      <height>206</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -161,7 +161,7 @@
       <string>Encoder Speed</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_08">
+    <widget class="QCheckBox" name="cb_10">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -174,7 +174,7 @@
       <string>Current Setpoint</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_09">
+    <widget class="QCheckBox" name="cb_11">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -187,7 +187,7 @@
       <string>Current Measured</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_10">
+    <widget class="QCheckBox" name="cb_12">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -200,7 +200,7 @@
       <string>Temperature</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_11">
+    <widget class="QCheckBox" name="cb_13">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -210,88 +210,20 @@
       </rect>
      </property>
      <property name="text">
-      <string>FET Temperature</string>
+      <string>Position Target</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="cb_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>175</y>
-       <width>151</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Acceleration</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cb_13">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>200</y>
-       <width>151</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Acceleration Angle</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="gb_general">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>435</y>
-      <width>251</width>
-      <height>106</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font-size: 13px;</string>
-    </property>
-    <property name="title">
-     <string>General</string>
-    </property>
     <widget class="QCheckBox" name="cb_14">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>25</y>
-       <width>151</width>
+       <y>175</y>
+       <width>156</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Left Wheel Speed</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cb_15">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>161</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Right Wheel Speed</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="cb_16">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>75</y>
-       <width>161</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Actuator Torque</string>
+      <string>Torque Target</string>
      </property>
     </widget>
    </widget>
@@ -299,7 +231,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>550</y>
+      <y>415</y>
       <width>75</width>
       <height>31</height>
      </rect>

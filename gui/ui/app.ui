@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1256</width>
+    <width>558</width>
     <height>683</height>
    </rect>
   </property>
@@ -563,29 +563,12 @@ border: 1px solid #D2D2D2;</string>
      <property name="title">
       <string>Speed</string>
      </property>
-     <widget class="QLabel" name="lb_data_233">
+     <widget class="QLabel" name="lb_data_20">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>45</y>
-        <width>111</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: white;
-border: 1px solid #D2D2D2;</string>
-      </property>
-      <property name="text">
-       <string>0.00</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_data_265">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>45</y>
-        <width>111</width>
+        <width>231</width>
         <height>31</height>
        </rect>
       </property>
@@ -607,20 +590,7 @@ border: 1px solid #D2D2D2;</string>
        </rect>
       </property>
       <property name="text">
-       <string>Left Wheel</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_22">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>25</y>
-        <width>106</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Right Wheel</string>
+       <string>GPS Speed</string>
       </property>
      </widget>
     </widget>
@@ -1012,9 +982,9 @@ border: 1px solid #D2D2D2;</string>
     <widget class="QScrollArea" name="scrollArea">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>10</x>
        <y>65</y>
-       <width>656</width>
+       <width>651</width>
        <height>491</height>
       </rect>
      </property>
@@ -1029,7 +999,7 @@ border: 1px solid #D2D2D2;</string>
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>656</width>
+        <width>651</width>
         <height>491</height>
        </rect>
       </property>

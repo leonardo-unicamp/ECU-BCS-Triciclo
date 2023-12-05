@@ -375,21 +375,35 @@ void vCommunicationStopBroadcast(void)
 // Parameters:  n/a                                                     //
 // Returns:     n/a                                                     //
 //**********************************************************************//
+uint8_t uiTesteCounter;
 void vCommunicationSendBroadcast(void)
 {
-	char cTemp[16];
-	char cBuffer[256] = "#b";
+	char  cValueGet;
+	int   iValueGet;
+	float fValueGet;
+	char cBuffer[32] = "#b";
 
-	uint8_t uiCounter;
-	uint8_t uiMaxCounter = xComSettings.xBroadcast.uiCounter;
+	if(uiTesteCounter == 24)
+		uiTesteCounter = 0;
+	else
+		uiTesteCounter++;
 
-	for(uiCounter = 0; uiCounter < uiMaxCounter; uiCounter++)
+	switch(xComSettings.smBuffer[uiTesteCounter].eDataType)
 	{
-		sprintf(cTemp, "%.2f;", *xComSettings.xBroadcast.pBuffer[uiCounter]);
-		strcat(cBuffer, cTemp);
-	}
+		case INT:
+			iValueGet = *xComSettings.smBuffer[uiTesteCounter].iData;
+			sprintf(cBuffer, "#a%.2dv%d;\n\r", uiTesteCounter, iValueGet);
+			break;
 
-	strcat(cBuffer, "\n\r");
+		case FLOAT:
+			fValueGet = *xComSettings.smBuffer[uiTesteCounter].fData;
+			sprintf(cBuffer, "#a%.2dv%.5f;\n\r", uiTesteCounter, fValueGet);
+			break;
+
+		case CHAR:
+			cValueGet = *xComSettings.smBuffer[uiTesteCounter].cData;
+			sprintf(cBuffer, "#a%.2dv%c;\n\r", uiTesteCounter, cValueGet);
+	}
 	vCommunicationWrite(cBuffer);
 }
 

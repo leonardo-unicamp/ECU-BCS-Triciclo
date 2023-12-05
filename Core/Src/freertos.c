@@ -26,10 +26,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sensorReadings.h"
+#include "lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 typedef StaticTask_t osStaticThreadDef_t;
+typedef StaticQueue_t osStaticMessageQDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -77,7 +79,7 @@ const osThreadAttr_t systemInit_attributes = {
   .cb_size = sizeof(systemInitControlBlock),
   .stack_mem = &systemInitBuffer[0],
   .stack_size = sizeof(systemInitBuffer),
-  .priority = (osPriority_t) osPriorityRealtime1,
+  .priority = (osPriority_t) osPriorityRealtime6,
 };
 /* Definitions for systemControl */
 osThreadId_t systemControlHandle;
@@ -103,6 +105,29 @@ const osThreadAttr_t motorControl_attributes = {
   .stack_size = sizeof(motorControlBuffer),
   .priority = (osPriority_t) osPriorityRealtime2,
 };
+/* Definitions for lcd */
+osThreadId_t lcdHandle;
+uint32_t lcdBuffer[ 2048 ];
+osStaticThreadDef_t lcdControlBlock;
+const osThreadAttr_t lcd_attributes = {
+  .name = "lcd",
+  .cb_mem = &lcdControlBlock,
+  .cb_size = sizeof(lcdControlBlock),
+  .stack_mem = &lcdBuffer[0],
+  .stack_size = sizeof(lcdBuffer),
+  .priority = (osPriority_t) osPriorityRealtime5,
+};
+/* Definitions for lcdMessageQueue */
+osMessageQueueId_t lcdMessageQueueHandle;
+uint8_t lcdMessageQueueBuffer[ 16 * sizeof( lcdMessage_t ) ];
+osStaticMessageQDef_t lcdMessageQueueControlBlock;
+const osMessageQueueAttr_t lcdMessageQueue_attributes = {
+  .name = "lcdMessageQueue",
+  .cb_mem = &lcdMessageQueueControlBlock,
+  .cb_size = sizeof(lcdMessageQueueControlBlock),
+  .mq_mem = &lcdMessageQueueBuffer,
+  .mq_size = sizeof(lcdMessageQueueBuffer)
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -114,6 +139,7 @@ extern void vSensorReadingsStart(void *argument);
 extern void vSystemInitStart(void *argument);
 extern void vSystemControlStart(void *argument);
 extern void vMotorControlStart(void *argument);
+extern void vLcdStart(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -139,6 +165,10 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of lcdMessageQueue */
+  lcdMessageQueueHandle = osMessageQueueNew (16, sizeof(lcdMessage_t), &lcdMessageQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -158,6 +188,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of motorControl */
   motorControlHandle = osThreadNew(vMotorControlStart, NULL, &motorControl_attributes);
+
+  /* creation of lcd */
+  lcdHandle = osThreadNew(vLcdStart, NULL, &lcd_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

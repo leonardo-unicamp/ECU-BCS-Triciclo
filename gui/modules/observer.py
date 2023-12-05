@@ -86,17 +86,13 @@ class Observer(QThread):
         """
 
         while self.is_running:
-
-            now = datetime.now().strftime("%H:%M:%S.%f")
-
-            for name, items in self.variables.items():
-                value = self.get_function(items["command"])
-                if value is not None:
+            received = self.get_function()
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if received is not None:
+                id, value = received
+                if id is not None and id.isnumeric() and value is not None:
                     if self.save_path is not None:
-                        with open(self.save_path + f"/{name}.txt", "a") as file:
+                        with open(self.save_path + f"/{id}.txt", "a") as file:
                             file.write(f"{now},{value}\n")
-                    if value != items["value"]:
-                        items["value"] = value
-                        items["callback"](name, value)
-
-            sleep(self.delay)
+                    self.variables[id]["value"] = value
+                    self.variables[id]["callback"](id, value)

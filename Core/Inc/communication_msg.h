@@ -209,7 +209,7 @@ void create(void){
 	// Message ID: 20
 	stateMachineData_t smGPSSpeed = {
 		.fData      = &xSensorReadings.xGPS.fSpeed,
-		.eDataType  = CHAR,
+		.eDataType  = FLOAT,
 		.uiReadable = SM_TRUE,
 		.uiWritable = SM_FALSE
 	};

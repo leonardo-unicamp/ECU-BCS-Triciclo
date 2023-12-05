@@ -23,7 +23,7 @@ from windows.sin_config import SinWindow
 class App(QMainWindow):
 
 
-    signal_update_values = pyqtSignal(str, float)
+    signal_update_values = pyqtSignal(str, str)
 
 
     def __init__(self) -> None:
@@ -110,8 +110,8 @@ class App(QMainWindow):
             self.btn_play.setEnabled(False)
             self.btn_stop.setEnabled(True)
 
-            self.observer = Observer(self.comm.get, delay=0.1)
-            for i in range(26):
+            self.observer = Observer(self.comm.serialRead, delay=0.05)
+            for i in range(25):
                 self.observer.appendVariable("%.2d" % i, "#g%.2d;" % i, self.signal_update_values.emit)
             self.observer.setSavePath(folder)
             self.observer.start()
@@ -129,7 +129,7 @@ class App(QMainWindow):
         self.observer.stop()
 
 
-    def updateDisplayValues(self, name: str, value: float):
+    def updateDisplayValues(self, name: str, value: str):
 
         """
         Updates the display values.
@@ -140,13 +140,36 @@ class App(QMainWindow):
         value (float): value of the variable.
         """
 
-        label_widget = self.findChild(QLabel, "lb_data_%.2d" % int(name))
-        if label_widget is not None:
-            label_widget.setText("%.2f" % value)
-            if name not in self.plots_data.keys():
-                self.plots_data[name] = [value]
-            else:
-                self.plots_data[name].append(value)
+        try:
+            label_widget = self.findChild(QLabel, "lb_data_%.2d" % int(name))
+            if label_widget is not None:
+                check_number = value.replace(".", "").replace("-", "")
+                if check_number.isnumeric():
+                    value = float(value)
+                    label_widget.setText("%.5f" % value)
+                    if name not in self.plots_data.keys():
+                        self.plots_data[name] = [value]
+                    else:
+                        self.plots_data[name].append(value)
+                else:
+                    label_widget.setText(value)
+        except:
+            pass
+
+    def plotGetData(self, param: str):
+
+        """
+        Returns the current value to be plotted.
+
+        Params
+        ------
+        param (str): name of the parameter.
+        """
+
+        if param in self.plots_data.keys():
+            return self.plots_data[param][-1]
+        else:
+            return None
 
 
     def addPlot(self, parameters: list):
@@ -163,7 +186,7 @@ class App(QMainWindow):
             len_x=100,
             interval=50,
             params=parameters,
-            get_fnc=self.observer.get
+            get_fnc=self.plotGetData
         )
 
         self.plots.append({

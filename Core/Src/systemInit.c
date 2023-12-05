@@ -11,6 +11,7 @@
 
 extern Axis xAxes;
 extern osThreadId_t systemControlHandle;
+extern lcdSettings_t xLcdSettings;
 
 uint8_t cTeste;
 
@@ -23,6 +24,7 @@ uint8_t cTeste;
 void vSystemInitStart()
 {
 	vSensorReadingsInit();
+	vLcdInit();
 	vCommunicationInit(&huart3, &huart7);
 
 	HAL_UART_Receive_IT(&huart6, &cTeste, 1);
@@ -31,6 +33,15 @@ void vSystemInitStart()
 	osThreadFlagsSet(systemControlHandle, 0b1);
 
 	vActuatorConfigSin(0.1, 8*3.14/181, 0, 0);
+
+	lcdMessage_t xOdometryMessage1 = {
+		.uiTime               = 1000,
+		.cFirstLine           = "Teste",
+		.cSecondLine          = "Teste",
+		.uiFirstLineHasValue  = LCD_NO,
+		.uiSecondLineHasValue = LCD_NO,
+	};
+	vLcdAppendMessageToCarrousel(xOdometryMessage1);
 
 	while(1)
 	{

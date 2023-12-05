@@ -3,7 +3,7 @@
 # Created at: 2023-10-27
 # Last update: 2023-10-28
 
-import numpy as np 
+from datetime import datetime
 
 import sys
 sys.path.append("../gui")
@@ -112,14 +112,23 @@ class Communication:
         """
 
         if self.serial["isConnected"]:
-            message = self.serial["connection"].readline().decode("utf-8")
-            if "#a" in message:
-                param = message[2:4]
-                value = message[5:-2]
-                return param, value
+            try: 
+                message = []
+                while len(message) == 0 or message[-1] != "\r":
+                    char = self.serial["connection"].read(1).decode("utf-8")
+                    message.append(char)
+                message = "".join(message)
+                if "#a" in message:
+                    param = message[2:4]
+                    value = message[5:-2]
+                    value = value.replace(";", "")
+                    return param, value
+                return None, None
+            except:
+                return None, None
         else:
             print("Serial is not connected.")
-            return None
+            return None, None
 
 
     def get(self, command: str):
@@ -134,17 +143,17 @@ class Communication:
 
         if self.serial["isConnected"]:
             self.serialWrite(command)
-            return self.serialRead()
+            value = self.serialRead()
+            return value
         elif self.bluetooth["isConnected"]:
-            return None
+            return None, None
         else:
             return 0
-
 
 
 if __name__ == "__main__":
     com = Communication()
     ports = com.serialGetAvailableDevices()
-    com.serialConnect("COM12", 115200)
+    com.serialConnect("COM8", 1000000)
     for i in range(19):
         print(com.get("#g%.2d;" % i))

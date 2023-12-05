@@ -38,7 +38,7 @@ class MatplotlibWidget(FigureCanvas):
         ]
 
         # Build the figure
-        self.figure.subplots_adjust(left=0.05, top=0.95, right=0.95, bottom=0.1)
+        self.figure.subplots_adjust(left=0.1, top=0.95, right=0.95, bottom=0.1)
         self.ax = self.figure.subplots()
         self.ax.ticklabel_format(style="plain") 
         self.ax.set_facecolor("#f0f0f0")
@@ -71,7 +71,7 @@ class MatplotlibWidget(FigureCanvas):
         """
 
         for i in range(len(self.lines)):
-            self.y[i].append(round(self.get_fnc(self.params[i]), 2))
+            self.y[i].append(self.get_fnc(self.params[i]))
             self.y[i] = self.y[i][-self.len_x:]
             self.lines[i].set_ydata(self.y[i])
             self.ax.draw_artist(self.lines[i])

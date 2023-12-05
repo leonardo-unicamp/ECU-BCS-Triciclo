@@ -9,6 +9,7 @@
 
 #include "actuator.h"
 #include "motorControl.h"
+#include "communication.h"
 
 #define FALSE  0
 #define TRUE   1
@@ -33,6 +34,7 @@ uint8_t uiAllowPositionControl;
 enum MotorModes xLastMode;
 
 int iSMChangeMotorMode;
+int streamCounter = 0;
 
 extern sensorReadings_t xSensorReadings;
 
@@ -126,7 +128,15 @@ void vMotorControlStart()
 
             case MM_SIN_MOVEMENT:
             	if(xLastMode != MM_SIN_MOVEMENT)
+            	{
             		uiSinMovementCounter = 0;
+            		vActuatorConfigSin(
+                		xActSettings.sin.fMagnitude,
+            			xActSettings.sin.fFrequency,
+            			xActSettings.sin.fPhase,
+            			xActSettings.sin.fMeanValue
+            		);
+            	}
 
             	if(uiAllowPositionControl)
             	{
@@ -145,6 +155,7 @@ void vMotorControlStart()
         }
 
         osDelay(10);
+        vCommunicationSendBroadcast();
     }
 }
 

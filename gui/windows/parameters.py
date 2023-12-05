@@ -36,9 +36,12 @@ class ParametersWindow(QMainWindow):
         
         self.selected = []
         for i in range(self.num_options):
-            checkbox = self.findChild(QCheckBox, "cb_%.2d" % i)
-            if checkbox.isChecked():
-                self.selected.append("%.2d" % i)
+            try:
+                checkbox = self.findChild(QCheckBox, "cb_%.2d" % i)
+                if checkbox.isChecked():
+                    self.selected.append("%.2d" % i)
+            except:
+                pass
         self.signal_add.emit(self.selected)
 
 
