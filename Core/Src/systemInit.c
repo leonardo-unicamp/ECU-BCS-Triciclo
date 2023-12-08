@@ -12,6 +12,7 @@
 extern Axis xAxes;
 extern osThreadId_t systemControlHandle;
 extern lcdSettings_t xLcdSettings;
+extern sensorReadings_t xSensorReadings;
 
 uint8_t cTeste;
 
@@ -23,8 +24,8 @@ uint8_t cTeste;
 //**********************************************************************//
 void vSystemInitStart()
 {
-	vSensorReadingsInit();
 	vLcdInit();
+	vSensorReadingsInit();
 	vCommunicationInit(&huart3, &huart7);
 
 	HAL_UART_Receive_IT(&huart6, &cTeste, 1);
@@ -36,12 +37,37 @@ void vSystemInitStart()
 
 	lcdMessage_t xOdometryMessage1 = {
 		.uiTime               = 1000,
-		.cFirstLine           = "Teste",
-		.cSecondLine          = "Teste",
-		.uiFirstLineHasValue  = LCD_NO,
-		.uiSecondLineHasValue = LCD_NO,
+		.cFirstLine           = "Lat: %.2f",
+		.pFirstLineValue      = &xSensorReadings.xGPS.fLatitude,
+		.cSecondLine          = "Lon: %.2f",
+		.pSecondLineValue     = &xSensorReadings.xGPS.fLongitude,
+		.uiFirstLineHasValue  = LCD_YES,
+		.uiSecondLineHasValue = LCD_YES,
 	};
 	vLcdAppendMessageToCarrousel(xOdometryMessage1);
+
+	lcdMessage_t xOdometryMessage2 = {
+		.uiTime               = 1000,
+		.cFirstLine           = "Acc-X: %.4f",
+		.pFirstLineValue      = &xSensorReadings.xIMU.xAccelerometer.fX,
+		.cSecondLine          = "Acc-Z: %.4f",
+		.pSecondLineValue     = &xSensorReadings.xIMU.xAccelerometer.fZ,
+		.uiFirstLineHasValue  = LCD_YES,
+		.uiSecondLineHasValue = LCD_YES,
+	};
+	vLcdAppendMessageToCarrousel(xOdometryMessage2);
+
+	lcdMessage_t xOdometryMessage3 = {
+		.uiTime               = 1000,
+		.cFirstLine           = "Temp: %.2f",
+		.pFirstLineValue      = &xSensorReadings.xIMU.fTemperature,
+		.cSecondLine          = "",
+		.uiFirstLineHasValue  = LCD_YES,
+		.uiSecondLineHasValue = LCD_NO,
+	};
+	vLcdAppendMessageToCarrousel(xOdometryMessage3);
+
+
 
 	while(1)
 	{
